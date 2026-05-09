@@ -30,41 +30,12 @@ DATA_PATH: Path = Path("data\\datasample.csv")
 
 
 
-def his(rows, index):
-    pass
-
-
-
-
-def count_weekdays(df):
-    df = df.value_counts()
-        # Plot histogram for the 'values' column
-    df.plot.hist()
-
-    # Add labels and title
-    plt.xlabel('Value')
-    plt.ylabel('Frequency')
-    plt.title('Histogram of Values')
-
-    # Show the plot
-    plt.show() 
-
-def main():
+def plot_histogram(df, column: str) -> None:
     
-    # Read the CSV file into a DataFrame
-    df = pd.read_csv(DATA_PATH, delimiter=";")
-    df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
-    a = df["Frigivelsesdato"].to_list()
-    data = Counter(a)
-
-
-    # Vis resultatet
-    # Ekstraher nøgler (kategorier) og værdier (hyppigheder)
+    data = df[column].value_counts().to_dict()
     categories = list(data.keys())
     values = list(data.values())
-
-    # Lav et barplot (histogram for diskrete data)
-    plt.bar(categories, values, color='skyblue', edgecolor='black')
+    plt.bar(categories, values)
 
     # Tilføj titler og labels
     plt.title('Histogram af dictionary')
@@ -73,34 +44,29 @@ def main():
     plt.xticks(rotation=45)  # Rotér x-aksens labels for bedre læsbarhed
     plt.tight_layout()
 
-    # Vis plot
     plt.show()
-    return
-    # Display the first few rows
-    #print(df.head())
-    #count_weekdays(df["Frigivelsesdato"])
+
+
+
+def step_1():
+    df = pd.read_csv(DATA_PATH, delimiter=";")
+    df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
+    plot_histogram(df, "Frigivelsesdato")
+
+
+def step_2():
+    # Vi fraregne uge 52 og 53 (uge 01 i år 2025), da det er midt i juleferien, hvilket ikke er med til at give et retvisende billede af en vagtplan.
+    df = pd.read_csv(DATA_PATH, delimiter=";")
+    df = df[df["Week"] <= 51]
+    df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
+    plot_histogram(df, "Frigivelsesdato")
     
-    # Opret DataFrame
-    data = {"d": ["11-11-2024", "12-11-2024", "14-11-2024", "17-11-2024"], "count": [1, 0, 4, 2]}
-    df = pd.DataFrame(data)
-    df['d'] = pd.to_datetime(df['d'], format='%d-%m-%Y')
-    
-    df.set_index('d', inplace=True)
 
-    # Konverter 'd' kolonnen til datetime
 
-    # Plot histogram
-    df.plot(kind='bar', width=1,  y='count', legend=False)
 
-    # Tilføj titler og labels
-    plt.title('Histogram over count pr. dato')
-    plt.xlabel('Dato')
-    plt.ylabel('Count')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    # Vis plot
-    plt.show()
+def main():
+    # step_1()
+    step_2()
 
 
 
