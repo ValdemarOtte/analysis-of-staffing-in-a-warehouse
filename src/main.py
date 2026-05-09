@@ -13,19 +13,6 @@ import pandas as pd
 
 
 DATA_PATH: Path = Path("data\\datasample.csv")
-# Det ses i `datasample.csv` at der er følgende kolumner
-# Year                  : År
-# Month                 : Måned
-# Week                  : Ugenummer
-# Weekday               : Ugesdag (0 = mandag, ..., 6 = søndag)
-# Frigivelsesdato       : Dato for modtagelse af bestillingen. Format (DD-MM-YYYY)
-# Lager                 : Hvilket lager varen findes i
-# Lagerområde           : Hvilket lagerområde varen findes i
-# KO/DO                 :
-# Hour                  : Hvilket tidspunkt bestilling er modtaget
-# Afgangstid            :
-# Antal_linjer          :
-# Teoretisk_bemandning  :
 
 
 
@@ -62,11 +49,31 @@ def step_2():
     plot_histogram(df, "Frigivelsesdato")
     
 
+def step_3():
+    df = pd.read_csv(DATA_PATH, delimiter=";")
+    df = df[df["Week"] <= 51]
+    df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
+    warehourses = df["Lager"].unique()
+    for warehouse in warehourses:
+        temp_df = df[df["Lager"] == warehouse]
+        plot_histogram(temp_df, "Frigivelsesdato")
 
+
+
+def step_4():
+    df = pd.read_csv(DATA_PATH, delimiter=";")
+    df = df[df["Week"] <= 51]
+    df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
+    warehourses = df["Lager"].unique()
+    for warehouse in warehourses:
+        temp_df = df[df["Lager"] == warehouse]
+        plot_histogram(temp_df, "Lagerområde")
 
 def main():
     # step_1()
-    step_2()
+    # step_2()
+    # step_3()
+    step_4()
 
 
 
