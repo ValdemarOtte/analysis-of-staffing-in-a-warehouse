@@ -48,7 +48,6 @@ def plot_histogram(data: dict[str, list[int | float]], title: str = "Histogram",
     plt.show()
 
 
-
 def step_1() -> None:
     """
     Load data in and plot frequenli of `Frigivelsesdato` as a histogram.
