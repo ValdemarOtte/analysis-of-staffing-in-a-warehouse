@@ -26,7 +26,7 @@
 | Year                  | År                                                       |
 | Month                 | Måned                                                    |
 | Week                  | Ugenummer                                                |
-| Weekday               | Ugesdag (0 = mandag, ..., 6 = søndag)                    |
+| Weekday               | Ugesdag (1 = mandag, ..., 7 = søndag)                    |
 | Frigivelsesdato       | Dato for modtagelse af bestillingen. Format (DD-MM-YYYY) |
 | Lager                 | Hvilket lager varen findes i                             |
 | Lagerområde           | Hvilket lagerområde varen findes i                       |
