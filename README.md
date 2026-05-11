@@ -14,6 +14,7 @@
    - Find middelværdi og variance
    - Fordeling
    - Plot det
+   - Er dae o time udfæniede af laerområde?
 - Trin 4)
    - Kan vi lave en timeplan herpå?
 
@@ -21,20 +22,20 @@
 
 # Analyse
 ## Hvordan ser dataet ud?
-| Kolonne               | Beskrivelse                                              |
-| --------------------- | -------------------------------------------------------- |
-| Year                  | År                                                       |
-| Month                 | Måned                                                    |
-| Week                  | Ugenummer                                                |
-| Weekday               | Ugesdag (1 = mandag, ..., 7 = søndag)                    |
-| Frigivelsesdato       | Dato for modtagelse af bestillingen. Format (DD-MM-YYYY) |
-| Lager                 | Hvilket lager varen findes i                             |
-| Lagerområde           | Hvilket lagerområde varen findes i                       |
-| KO/DO                 |
-| Hour                  | Hvilket tidspunkt bestilling er modtaget                 |
-| Afgangstid            |
-| Antal_linjer          |
-| Teoretisk_bemandning  |
+| Kolonne               | Beskrivelse                                                |
+| --------------------- | ---------------------------------------------------------- |
+| Year                  | År                                                         |
+| Month                 | Måned                                                      |
+| Week                  | Ugenummer                                                  |
+| Weekday               | Ugesdag (1 = mandag, ..., 7 = søndag)                      |
+| Frigivelsesdato       | Dato for modtagelse af bestillingen. Format (DD-MM-YYYY)   |
+| Lager                 | Hvilket lager varen findes i                               |
+| Lagerområde           | Hvilket lagerområde varen findes i                         |
+| KO/DO                 | Hvilken slas bestilling det er                             |
+| Hour                  | Hvilket tidspunkt bestilling er modtaget                   |
+| Afgangstid            | vornår bestillingen forlader lageret                       |
+| Antal_linjer          | Hvor mange varer der er i en given bestilling              |
+| Teoretisk_bemandning  | Den teorietiske tid som medarbejderen bruger på bestilling |
 
 ## Hvornår bliver en bestilling lavet?
 Billede af histogram 1
@@ -52,4 +53,7 @@ Billede af histogram 4 for lagerområder for lager 2
 
 
 
-###
+### vor urti pakker medarbejdede?
+
+
+Dermed ses det, at en medarbejder teoretisk vil kunne pakke 35 enstande pr. time.
