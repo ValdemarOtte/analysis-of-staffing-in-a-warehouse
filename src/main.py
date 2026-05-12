@@ -26,13 +26,31 @@ WEEKDAYS: dict[int, str] = {
 plt.style.use("ggplot")
 
   
-def convert_to_float(strin):
+def convert_to_float(string: str) -> float:
     """
+    Convert a string to a float.
     
-    e.x. iven te strin `"0,282"`, ten te function will return te float `0.282`.
+    e.x. given the strin `"0,282"`, then `convert_to_float` will return the float `0.282`.
     
+    Parameters
+    ----------
+    string : str
+        The string which will be converted to a float
+        
+    Returns
+    -------
+    float
+        The converted string
+    
+    Raises
+    ------
+    ValueError
+        If the input string cannot be converted to a float.
     """
-    return float(strin.replace(",", "."))
+    try:
+        return float(string.replace(",", "."))
+    except ValueError:
+        raise ValueError(f"Could not convert '{string}' to float.")
 
 
 def plot_histogram(
@@ -44,8 +62,8 @@ def plot_histogram(
     """
     Plots a histogram from a dictionary of keys and their corresponding values.
 
-    Args:
-    ----
+    Parameters
+    ----------
         data: A dictionary object.
         title: The title of the histogram. Defaults to `Histogram`.
         xlabel: The label for the x-axis. Defaults to `X label`.
@@ -72,8 +90,8 @@ def plot_lineplot(
     """
     Plots a line-plot from a dictionary of keys and their corresponding values.
 
-    Args:
-    ----
+    Parameters
+    ----------
         data: A dictionary object.
         title: The title of the line-plot. Defaults to `Line-plot`.
         xlabel: The label for the x-axis. Defaults to `X label`.
@@ -87,7 +105,7 @@ def plot_lineplot(
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.xticks(rotation=45)
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.show()
 
 
@@ -96,6 +114,7 @@ def step_1() -> None:
     Load data and plot frequency of `Frigivelsesdato` as a histogram.
     """
     df = pd.read_csv(DATA_PATH, delimiter=";")
+    
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
     data = df["Frigivelsesdato"].value_counts().to_dict()
     plot_histogram(data, "Histogram over frigivelser af bestillinger over datoer", "Frigivelsesdatoer", "Frekvens")
@@ -108,6 +127,7 @@ def step_2() -> None:
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
+    
     data = df["Frigivelsesdato"].value_counts().to_dict()
     plot_histogram(data, "Histogram over frigivelser af bestillinger over datoer uden uge 52 og 53", "Frigivelsesdatoer", "Frekvens")
     
@@ -132,14 +152,10 @@ def step_3() -> None:
     print(f"Median          : {median_val:.2f}")
 
 
-    
-
-
 def step_4():
     """
-    Plot the 
+    Plot and view the relationship between `Antal_linjer` and `Teoretisk_bemandning`.
     """
-    
     df = pd.read_csv(DATA_PATH, delimiter=";")
     data = dict(zip(df["Antal_linjer"], df["Teoretisk_bemandning"]))
 
@@ -149,7 +165,21 @@ def step_4():
 
 
 
-def step_5(column: str) -> None:
+def step_5(column: str, title: str) -> None:
+    """
+    Load and plot data for every unique warehouse in the dataset.
+    
+    This function is called twice:
+    - Once with `column="Frigivelsesdato"`
+    - Once with `column="Lagerområde"`
+    
+    Parameters
+    ----------
+    column : str
+        The column name in the dataset to analyze.
+    title : str
+        The title for the histogram.
+    """
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
@@ -157,62 +187,7 @@ def step_5(column: str) -> None:
     for warehouse in df["Lager"].unique():
         temp_df = df[df["Lager"] == warehouse]
         data = temp_df[column].value_counts().to_dict()
-        plot_histogram(data)
-
-
-
-
-
-def step_4_():
-    df = pd.read_csv(DATA_PATH, delimiter=";")
-    df = df[df["Week"] <= 51]
-    df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
-    for warehouse in df["Lager"].unique():
-        temp_df = df[df["Lager"] == warehouse]
-        data = []
-        for week in temp_df["Week"].unique():
-            a = temp_df[temp_df["Week"] == week]
-            data.append(a["Weekday"].value_counts().to_dict())
-
-        days = {WEEKDAYS[day]: [0] for day in range(1, 8)}
-        for value in data:
-            for day in range(1, 8):
-                try:
-                    days[WEEKDAYS[day]].append(value[day])
-                except KeyError:
-                    pass
-
-        data = {}
-        for key, value in days.items():
-            data[key] = np.mean(value)
-        plot_histogram(data)
-
-
-def step_5_():
-    df = pd.read_csv(DATA_PATH, delimiter=";")
-    df = df[df["Week"] <= 51]
-    df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
-    for warehouse in df["Lager"].unique():
-        temp_df = df[df["Lager"] == warehouse]
-        data = []
-        for week in temp_df["Week"].unique():
-            a = temp_df[temp_df["Week"] == week]
-            data.append(a["Hour"].value_counts().to_dict())
-
-        days = {day: [0] for day in range(0, 25)}
-        for value in data:
-            for day in range(0, 25):
-                try:
-                    days[day].append(value[day])
-                except KeyError:
-                    pass
-
-        data = {}
-        for key, value in days.items():
-            data[key] = np.mean(value)
-        plot_histogram(data)
-
-
+        plot_histogram(data, f"{title} for {warehouse}", column, "Frekvens")
 
 
 def step_6():
@@ -362,11 +337,11 @@ def main():
     # step_2()
     # step_3()
     # step_4()
-    # step_5("Frigivelsesdato")
-    # step_5("Lagerområde")
+    step_5("Frigivelsesdato", "Histogram over frigivelser af bestillinger over datoer uden uge 52 og 53")
+    step_5("Lagerområde", "Lagerområder")
     # step_6()
     # step_7()
-    step_8()
+    # step_8()
 
 if __name__ == "__main__":
     main()
