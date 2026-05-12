@@ -25,7 +25,7 @@ WEEKDAYS: dict[int, str] = {
 # Matplotlib style config
 plt.style.use("ggplot")
 
-
+  
 def convert_to_float(strin):
     """
     
@@ -109,9 +109,35 @@ def step_2() -> None:
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
     data = df["Frigivelsesdato"].value_counts().to_dict()
     plot_histogram(data)
+    
+    
+
+def step_3() -> None:
+    """
+    
+    """
+    df = pd.read_csv(DATA_PATH, delimiter=";")
+    df = df[df["Week"] <= 51]
+    print(f"Mindste værdi : {df['Antal_linjer'].min()}")
+    print(f"Største værdi : {df['Antal_linjer'].max()}")
+    print(f"Gennemsnit    : {df['Antal_linjer'].mean():.2f}")
+    print(f"Spredning     : {df['Antal_linjer'].var():.2f}")
+    print(f"Median        : {df['Antal_linjer'].median()}")
+
+    
 
 
-def step_3(column: str) -> None:
+def step_4():
+    df = pd.read_csv(DATA_PATH, delimiter=";")
+    data = dict(zip(df["Antal_linjer"], df["Teoretisk_bemandning"]))
+
+    for key, value in data.items():
+        data[key] = convert_to_float(value)
+    plot_lineplot(data)
+
+
+
+def step_5(column: str) -> None:
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
@@ -124,7 +150,8 @@ def step_3(column: str) -> None:
 
 
 
-def step_4():
+
+def step_4_():
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
@@ -149,7 +176,7 @@ def step_4():
         plot_histogram(data)
 
 
-def step_5():
+def step_5_():
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
@@ -174,23 +201,160 @@ def step_5():
         plot_histogram(data)
 
 
+
+
 def step_6():
     df = pd.read_csv(DATA_PATH, delimiter=";")
-    data = dict(zip(df["Antal_linjer"], df["Teoretisk_bemandning"]))
+    df = df[df["Week"] <= 51]
+    data = []
+    for week in df["Week"].unique():
+        temp_df = df[df["Week"] == week]
+        data.append(temp_df["Weekday"].value_counts().to_dict())
 
-    for key, value in data.items():
-        data[key] = convert_to_float(value)
-    plot_lineplot(data)
+    a = {key: [] for key in range(1, 8)}
+    for d in data:
+        for key, value in d.items():
+            try:
+                a[key].append(value)
+            except KeyError:
+                pass
+    di = {
+        "gennemsnit": [],
+        "max": [],
+        "min": [],
+    }
+    for key, value in a.items():
+        di["gennemsnit"].append(np.mean(value))
+        di["max"].append(max(value))
+        di["min"].append(min(value))
+        
+        
+    for key, value in di.items():
+        plt.plot(value, label=key)
+
+    # Add labels and legend
+    plt.xlabel("Index")
+    plt.ylabel("Value")
+    plt.title("Plot of Lists in Dictionary")
+    plt.legend()
+    plt.grid(True)
+
+    # Show the plot
+    plt.show()
+    #data = df["Weekday"].value_counts().to_dict()
+    #plot_histogram(data, "Histogram over friveks af bestillin over datoer", "Frigivelsesdatoer", "frequns")
+
+
+
+def step_7():
+    df = pd.read_csv(DATA_PATH, delimiter=";")
+    df = df[(df["Week"] <= 51) & (df["Weekday"] <= 5)]
+    data = []
+    for week in df["Week"].unique():
+        temp_df = df[df["Week"] == week]
+        data.append(temp_df["Hour"].value_counts().to_dict())
+    
+
+    a = {key: [] for key in range(0, 19)}
+    for d in data:
+        for key, value in d.items():
+            try:
+                a[key].append(value)
+            except KeyError:
+                pass
+    di = {
+        "gennemsnit": [],
+        "max": [],
+        "min": [],
+    }
+    for key, value in a.items():
+        di["gennemsnit"].append(np.mean(value))
+        di["max"].append(max(value))
+        di["min"].append(min(value))
+
+        
+    for key, value in di.items():
+        plt.plot(value, label=key)
+
+    # Add labels and legend
+    plt.xlabel("Index")
+    plt.ylabel("Value")
+    plt.title("Plot of Lists in Dictionary")
+    plt.legend()
+    plt.grid(True)
+
+    # Show the plot
+    plt.show()
+    #data = df["Weekday"].value_counts().to_dict()
+    #plot_histogram(data, "Histogram over friveks af bestillin over datoer", "Frigivelsesdatoer", "frequns")
+
+
+def step_8():
+    df = pd.read_csv(DATA_PATH, delimiter=";")
+    df = df[(df["Week"] <= 51) & (df["Weekday"] <= 5)]
+    data = []
+    for week in df["Week"].unique():
+        temp_df = df[df["Week"] == week]
+        data.append(temp_df["Hour"].value_counts().to_dict())
+    
+
+    a = {key: [0] for key in range(0, 23)}
+    for d in data:
+        for key, value in d.items():
+            try:
+                a[key].append(value)
+            except KeyError:
+                pass
+    di = []
+    for key, value in a.items():
+        di.append(np.mean(value))
+    
+    a = [0 for i in range(0, 23)]
+    for i in range(0, 23):
+        if 6 <= i and i <= 14:
+            a[i] += 35 * 6
+        if 8 <= i and i <= 16:
+            a[i] += 35 * 9
+        if 15 <= i and i <= 23:
+            a[i] += 35 * 2
+
+    c = [0]
+    d = []
+    for b, bb in zip(di, a):
+        if b - bb + c[-1] < 0:
+            d.append(-1 * (b - bb + c[-1]))
+            value = - c[-1]
+        else:
+            d.append(0)
+            value = b - bb
+        c.append(value + c[-1])
+    c = c[1:]
+    plt.plot(np.cumsum(di).tolist())
+    plt.plot(np.cumsum(a).tolist())
+    plt.plot(np.cumsum(d).tolist())
+    plt.plot(c)
+    
+    # Add labels and legend
+    plt.xlabel("Index")
+    plt.ylabel("Value")
+    plt.title("Plot of Lists in Dictionary")
+    plt.legend()
+    plt.grid(True)
+
+    # Show the plot
+    plt.show()
 
 
 def main():
-    #step_1()
+    # step_1()
     # step_2()
-    #step_3("Frigivelsesdato")
-    #step_3("Lagerområde")
+    # step_3()
     # step_4()
-    # step_5()
-    step_6()
+    # step_5("Frigivelsesdato")
+    # step_5("Lagerområde")
+    # step_6()
+    # step_7()
+    step_8()
 
 if __name__ == "__main__":
     main()
