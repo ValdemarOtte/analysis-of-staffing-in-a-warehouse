@@ -93,41 +93,53 @@ def plot_lineplot(
 
 def step_1() -> None:
     """
-    Load data in and plot frequenli of `Frigivelsesdato` as a histogram.
+    Load data and plot frequency of `Frigivelsesdato` as a histogram.
     """
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
     data = df["Frigivelsesdato"].value_counts().to_dict()
-    plot_histogram(data, "Histogram over friveks af bestillin over datoer", "Frigivelsesdatoer", "frequns")
+    plot_histogram(data, "Histogram over frigivelser af bestillinger over datoer", "Frigivelsesdatoer", "Frekvens")
 
 
 def step_2() -> None:
-    # Vi fratage uge 52 og 53 (uge 01 i år 2025), da det er midt i juleferien,
-    # hvilket ikke er med til at give et retvisende billede for en vagtplan.
+    """
+    Load data and plot frequency of `Frigivelsesdato` as a histogram, excluding weeks 52 and 53.
+    """
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
     data = df["Frigivelsesdato"].value_counts().to_dict()
-    plot_histogram(data)
-    
+    plot_histogram(data, "Histogram over frigivelser af bestillinger over datoer uden uge 52 og 53", "Frigivelsesdatoer", "Frekvens")
     
 
 def step_3() -> None:
     """
-    
+    Calculate the smallest and greatest value of `Antal_linjer`, as well as its mean, variance, and median.
     """
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
-    print(f"Mindste værdi : {df['Antal_linjer'].min()}")
-    print(f"Største værdi : {df['Antal_linjer'].max()}")
-    print(f"Gennemsnit    : {df['Antal_linjer'].mean():.2f}")
-    print(f"Spredning     : {df['Antal_linjer'].var():.2f}")
-    print(f"Median        : {df['Antal_linjer'].median()}")
+    
+    min_val = df["Antal_linjer"].min()
+    max_val = df["Antal_linjer"].max()
+    mean_val = df["Antal_linjer"].mean()
+    var_val = df["Antal_linjer"].var()
+    median_val = df["Antal_linjer"].median()
+
+    print(f"Mindste værdi   : {min_val}")
+    print(f"Største værdi   : {max_val}")
+    print(f"Gennemsnit      : {mean_val:.2f}")
+    print(f"Varians         : {var_val:.2f}")
+    print(f"Median          : {median_val:.2f}")
+
 
     
 
 
 def step_4():
+    """
+    Plot the 
+    """
+    
     df = pd.read_csv(DATA_PATH, delimiter=";")
     data = dict(zip(df["Antal_linjer"], df["Teoretisk_bemandning"]))
 
