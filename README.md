@@ -1,9 +1,9 @@
 # 
 
-# Problemstilling
+## Problemstilling
 
-# Analyse
-## Hvordan ser dataet ud?
+## Analyse
+### 2.1) Hvordan ser dataet ud?
 | Kolonne               | Beskrivelse                                                |
 | --------------------- | ---------------------------------------------------------- |
 | Year                  | År                                                         |
@@ -20,7 +20,7 @@
 | Teoretisk_bemandning  | Den teorietiske tid som medarbejderen bruger på bestilling |
 
 
-## Hvornår bliver en bestilling lavet?
+### 2.2) Hvornår bliver en bestilling lavet?
 Først plotter vi et histogram over hvilke datoer bestillingerne bliver lavet på.
 
 Herunder på fig. 1 ses det tydeligt, at der fremgår et fast mønster for hver uge.
@@ -36,7 +36,7 @@ Vi vælger at fratage disse to uge fra datasættet, da det er ferie uger og derm
 
 
 
-## Størrelsen på en bestilling
+## 2.3) Størrelsen på en bestilling
 Størrelsen på en bestilling er bestemt af variablen `Antal_linjer`.
 
 | Test          | Værdi   |
@@ -48,7 +48,7 @@ Størrelsen på en bestilling er bestemt af variablen `Antal_linjer`.
 | Median        |       2 |
 
 
-## Hvor hurtigt pakker en medarbejder en bestilling?
+## 2.4) Hvor hurtigt pakker en medarbejder en bestilling?
 Det er en variablet variabel, da det det 
 
 Vi ser dog i datasættet, at der er et lineært sammenhæng mellem `Antal_linjer` og `Teoretisk_bemandning`.
@@ -58,8 +58,8 @@ Vi ser dog i datasættet, at der er et lineært sammenhæng mellem `Antal_linjer
 Dermed ses det, at en medarbejder teoretisk vil kunne pakke 35 genstande pr. time.
 
 
-## I hvilket lager og lageområde findes bestillingen i?
-
+## 2.5) I hvilket lager og lageområde findes bestillingen i?
+### Lager
 Billede af histogram 1 for lager 1 og lager 2
 
 ![fig_4](./figures/fig_4.png)
@@ -76,26 +76,40 @@ For at holde analysen mindre kompleksi er der ikke blevet set på en time-basere
 Se konklusion for en uddybende diskontion omkring valget.
 
 
-## Fordeling på dags-baseret og time-basseret
-### dags-baseret
+## 2.6) Observeret fordeling på dagsbaseret
+
+![fig_8](./figures/fig_8.png)
 
 
-### time-basseret
+
+## 2.7) Observeret fordeling på timebaseret
 
 
+![fig_9](./figures/fig_9.png)
 
 
 For at holde analysen mindre kompleksi er der ikke blevet set på en time-baseret for hver ugedag.
 Se konklusion for en uddybende diskontion omkring valget.
 
 
-## Timeplan
+## 2.8) Timeplan
 Vi antager at medarbejderne kan fordeles på
 | Vagthold     | Tidsrum       |
 | ------------ | ------------- |
 | Morgenholdet | 06:00 - 14:00 |
 | Dagsholdet   | 08:00 - 16:00 |
 | Aftensholdet | 15:00 - 23:00 |
+
+
+Hertil vil en af løsningerne være følgende vagtplan:
+| Vagthold     | Antal |
+| ------------ | ----- |
+| Morgenholdet |    12 |
+| Dagsholdet   |    20 |
+| Aftensholdet |     8 |
+
+
+![fig_10](./figures/fig_10.png)
 
 
 I denne analyse antager vi, at medarbejder ikke kan deles mellem lagerne, men derimod godt imellem lagerområder. 

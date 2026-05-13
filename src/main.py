@@ -3,27 +3,20 @@
 from pathlib import Path
 
 # Third-party libraries
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 # Local files
+from src.plots import plot_histogram, plot_lineplot
 
 
 DATA_PATH: Path = Path("data\\datasample.csv")
-WEEKDAYS: dict[int, str] = {
-    1: "mandag",
-    2: "tirdag",
-    3: "onsdag",
-    4: "torsdag",
-    5: "fredag",
-    6: "lørdag",
-    7: "søndag",
-}
-
-
-# Matplotlib style config
-plt.style.use("ggplot")
+COLOR_SCHEME: list[str] = [
+    "#4169E1",
+    "#bb342f",
+    "#218380",
+    "#ead94c",
+]
 
   
 def convert_to_float(string: str) -> float:
@@ -53,62 +46,6 @@ def convert_to_float(string: str) -> float:
         raise ValueError(f"Could not convert '{string}' to float.")
 
 
-def plot_histogram(
-        data: dict[str, list[int | float]],
-        title: str = "Histogram", 
-        xlabel: str = "X label",
-        ylabel: str = "Y label"
-    ) -> None:
-    """
-    Plots a histogram from a dictionary of keys and their corresponding values.
-
-    Parameters
-    ----------
-        data: A dictionary object.
-        title: The title of the histogram. Defaults to `Histogram`.
-        xlabel: The label for the x-axis. Defaults to `X label`.
-        ylabel: The label for the y-axis. Defaults to `Y label`.
-
-    """
-    keys = list(data.keys())
-    values = list(data.values())
-    plt.bar(keys, values, color="#4169E1")
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
-    
-    
-def plot_lineplot(
-        data: dict[str, list[int | float]],
-        title: str = "Line-plot", 
-        xlabel: str = "X label",
-        ylabel: str = "Y label"
-    ) -> None:
-    """
-    Plots a line-plot from a dictionary of keys and their corresponding values.
-
-    Parameters
-    ----------
-        data: A dictionary object.
-        title: The title of the line-plot. Defaults to `Line-plot`.
-        xlabel: The label for the x-axis. Defaults to `X label`.
-        ylabel: The label for the y-axis. Defaults to `Y label`.
-
-    """
-    keys = list(data.keys())
-    values = list(data.values())
-    plt.plot(keys, values, color="#4169E1", marker='o', linestyle='-', linewidth=2)
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.xticks(rotation=45)
-    #plt.tight_layout()
-    plt.show()
-
-
 def step_1() -> None:
     """
     Load data and plot frequency of `Frigivelsesdato` as a histogram.
@@ -129,7 +66,7 @@ def step_2() -> None:
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
     
     data = df["Frigivelsesdato"].value_counts().to_dict()
-    plot_histogram(data, "Histogram over frigivelser af bestillinger over datoer uden uge 52 og 53", "Frigivelsesdatoer", "Frekvens")
+    plot_histogram(data, "Histogram over frigivelser af bestillinger over datoer (minus uge 52/53)", "Frigivelsesdatoer", "Frekvens")
     
 
 def step_3() -> None:
@@ -147,7 +84,7 @@ def step_3() -> None:
 
     print(f"Mindste værdi   : {min_val}")
     print(f"Største værdi   : {max_val}")
-    print(f"Gennemsnit      : {mean_val:.2f}")
+    print(f"mean      : {mean_val:.2f}")
     print(f"Varians         : {var_val:.2f}")
     print(f"Median          : {median_val:.2f}")
 
@@ -161,7 +98,7 @@ def step_4():
 
     for key, value in data.items():
         data[key] = convert_to_float(value)
-    plot_lineplot(data)
+    plot_lineplot_(data, "Sammenhæng mellem \"teoretisk bemandning\" og \"Antal linjer\"", "Teoretisk bemandning", "Antal linjer",)
 
 
 
@@ -190,158 +127,154 @@ def step_5(column: str, title: str) -> None:
         plot_histogram(data, f"{title} for {warehouse}", column, "Frekvens")
 
 
-def step_6():
+def find_values(df, column) -> tuple[dict[int, list[int]], int, int]:
+    elements = []
+    values = df["Week"].unique()
+    for week in values:
+        temp_df = df[df["Week"] == week]
+        elements.append(temp_df[column].value_counts().to_dict())
+    return elements
+
+
+def func(elements):
+    keys = [key for element in elements for key in element.keys()]
+    min_val = min(keys)
+    max_val = max(keys)
+    a = {key: [] for key in range(min_val, max_val+1)}
+    for element in elements:
+        for key, value in element.items():
+            try:
+                a[key].append(value)
+            except KeyError:
+                pass
+    return a
+
+def create_data_for_mean_min_max(a) -> dict[str, list[int | float]]:
+    data = {
+        "mean": [],
+        "max": [],
+        "min": [],
+    }
+    for value in a.values():
+        data["mean"].append(np.mean(value))
+        data["max"].append(max(value))
+        data["min"].append(min(value))
+    return data
+
+
+def step_6() -> None:
+    
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
-    data = []
-    for week in df["Week"].unique():
-        temp_df = df[df["Week"] == week]
-        data.append(temp_df["Weekday"].value_counts().to_dict())
-
-    a = {key: [] for key in range(1, 8)}
-    for d in data:
-        for key, value in d.items():
-            try:
-                a[key].append(value)
-            except KeyError:
-                pass
-    di = {
-        "gennemsnit": [],
-        "max": [],
-        "min": [],
-    }
-    for key, value in a.items():
-        di["gennemsnit"].append(np.mean(value))
-        di["max"].append(max(value))
-        di["min"].append(min(value))
-        
-        
-    for key, value in di.items():
-        plt.plot(value, label=key)
-
-    # Add labels and legend
-    plt.xlabel("Index")
-    plt.ylabel("Value")
-    plt.title("Plot of Lists in Dictionary")
-    plt.legend()
-    plt.grid(True)
-
-    # Show the plot
-    plt.show()
-    #data = df["Weekday"].value_counts().to_dict()
-    #plot_histogram(data, "Histogram over friveks af bestillin over datoer", "Frigivelsesdatoer", "frequns")
+    
+    elements = find_values(df, "Weekday")
+    a = func(elements)
+    data = create_data_for_mean_min_max(a)
+    plot_lineplot(data, "Graf over frekvens af bestillinger over ugedage", "Ugedage", "Frekvens")
 
 
-
-def step_7():
+def step_7() -> None:
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[(df["Week"] <= 51) & (df["Weekday"] <= 5)]
-    data = []
-    for week in df["Week"].unique():
-        temp_df = df[df["Week"] == week]
-        data.append(temp_df["Hour"].value_counts().to_dict())
     
-
-    a = {key: [] for key in range(0, 19)}
-    for d in data:
-        for key, value in d.items():
-            try:
-                a[key].append(value)
-            except KeyError:
-                pass
-    di = {
-        "gennemsnit": [],
-        "max": [],
-        "min": [],
-    }
-    for key, value in a.items():
-        di["gennemsnit"].append(np.mean(value))
-        di["max"].append(max(value))
-        di["min"].append(min(value))
-
-        
-    for key, value in di.items():
-        plt.plot(value, label=key)
-
-    # Add labels and legend
-    plt.xlabel("Index")
-    plt.ylabel("Value")
-    plt.title("Plot of Lists in Dictionary")
-    plt.legend()
-    plt.grid(True)
-
-    # Show the plot
-    plt.show()
-    #data = df["Weekday"].value_counts().to_dict()
-    #plot_histogram(data, "Histogram over friveks af bestillin over datoer", "Frigivelsesdatoer", "frequns")
+    elements = find_values(df, "Hour")
+    a = func(elements)
+    data = create_data_for_mean_min_max(a)
+    plot_lineplot(data, "Graf over frekvens af bestillinger over timer", "Tid", "Frekvens")
 
 
-def step_8():
-    df = pd.read_csv(DATA_PATH, delimiter=";")
-    df = df[(df["Week"] <= 51) & (df["Weekday"] <= 5)]
-    data = []
-    for week in df["Week"].unique():
-        temp_df = df[df["Week"] == week]
-        data.append(temp_df["Hour"].value_counts().to_dict())
-    
 
-    a = {key: [0] for key in range(0, 23)}
-    for d in data:
-        for key, value in d.items():
-            try:
-                a[key].append(value)
-            except KeyError:
-                pass
-    di = []
-    for key, value in a.items():
-        di.append(np.mean(value))
-    
-    a = [0 for i in range(0, 23)]
-    for i in range(0, 23):
-        if 6 <= i and i <= 14:
-            a[i] += 35 * 6
-        if 8 <= i and i <= 16:
-            a[i] += 35 * 9
-        if 15 <= i and i <= 23:
-            a[i] += 35 * 2
-
-    c = [0]
-    d = []
-    for b, bb in zip(di, a):
-        if b - bb + c[-1] < 0:
-            d.append(-1 * (b - bb + c[-1]))
-            value = - c[-1]
+def find_packages_left_and_wasted_time(mean, schedule):
+    packages_left = [0]
+    wasted_time = []
+    for x, y in zip(mean, schedule):
+        if x - y + packages_left[-1] < 0:
+            wasted_time.append(-1 * (x - y + packages_left[-1]))
+            value = - packages_left[-1]
         else:
-            d.append(0)
-            value = b - bb
-        c.append(value + c[-1])
-    c = c[1:]
-    plt.plot(np.cumsum(di).tolist())
-    plt.plot(np.cumsum(a).tolist())
-    plt.plot(np.cumsum(d).tolist())
-    plt.plot(c)
-    
-    # Add labels and legend
-    plt.xlabel("Index")
-    plt.ylabel("Value")
-    plt.title("Plot of Lists in Dictionary")
-    plt.legend()
-    plt.grid(True)
+            wasted_time.append(0)
+            value = x - y
+        packages_left.append(value + packages_left[-1])
+    packages_left = packages_left[1:]
+    return packages_left, wasted_time
 
-    # Show the plot
-    plt.show()
+
+def create_schedule(work_schedules: list[dict[str, int]]) -> list[int]:
+    schedule = [0 for _ in range(0, 24)]
+    for i in range(0, 23):
+        for work_schedule in work_schedules:
+            if work_schedule["start"] <= i and i <= work_schedule["end"]:
+                schedule[i] += 35 * work_schedule["amount"]                     # 35 is the number of lines each worker can do in a hour
+    return schedule
+
+
+def step_8(work_schedules: list[dict[str, int]]) -> None:
+    df = pd.read_csv(DATA_PATH, delimiter=";")
+    df = df[(df["Week"] <= 51) & (df["Weekday"] <= 5)]
+        
+    elements = find_values(df, "Hour")
+    a = func(elements)
+    # Because the median size of a package 
+    scalar = 2
+    a = {key: [value * scalar for value in values] for key, values in a.items()}
+    
+    mean = create_data_for_mean_min_max(a)["mean"]
+    # Extent the mean to be 24 hours
+    mean.extend([0 for _ in range(0, 24 - len(mean))])
+
+    schedule = create_schedule(work_schedules)
+    packages_left, wasted_time = find_packages_left_and_wasted_time(mean, schedule)
+
+    data = {
+        "Mean of confirmed order": np.cumsum(mean).tolist(),
+        "Schedule": np.cumsum(schedule).tolist(),
+        "Wasted time": np.cumsum(wasted_time).tolist(),
+        "Packages left": packages_left
+    }
+    plot_lineplot(data, "Graf over forventet pakker, pakket pakker af medarbejde, spildtid og pakker tilbage", "Tid", "Antal linjer")
 
 
 def main():
-    # step_1()
-    # step_2()
-    # step_3()
-    # step_4()
-    step_5("Frigivelsesdato", "Histogram over frigivelser af bestillinger over datoer uden uge 52 og 53")
-    step_5("Lagerområde", "Lagerområder")
-    # step_6()
-    # step_7()
-    # step_8()
+    # Brugt under "2.2) Hvornår bliver en bestilling lavet?"
+    #step_1()
+    #step_2()
+    
+    # Brugt under "2.3) Størrelsen på en bestilling"
+    #step_3()
+    
+    # Brugt under "2.4) Hvor hurtigt pakker en medarbejder en bestilling?"
+    #step_4()
+    
+    # Brugt under "2.5) I hvilket lager og lageområde findes bestillingen i?"
+    #step_5("Frigivelsesdato", "Histogram over frigivelser af bestillinger over datoer (minus uge 52/53)")
+    #step_5("Lagerområde", "Lagerområder")
+
+    # Brugt under "2.6) Observeret fordeling på dagsbaseret"
+    #step_6()
+    
+    # Brugt under "2.7) Observeret fordeling på timebaseret"
+    #step_7()
+    
+    # Brugt under "2.8) Time"
+    work_schedules = [
+        {
+            "start": 6,
+            "end": 14,
+            "amount": 12
+        },
+        {
+            "start": 8,
+            "end": 16,
+            "amount": 20
+        },
+        {
+            "start": 15,
+            "end": 23,
+            "amount": 8
+        },
+    ]
+    step_8(work_schedules)
+
 
 if __name__ == "__main__":
     main()
