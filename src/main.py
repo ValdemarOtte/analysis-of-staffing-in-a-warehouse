@@ -5,39 +5,14 @@ from pathlib import Path
 # Third-party libraries
 import numpy as np
 import pandas as pd
+from pandas import DataFrame
 
 # Local files
 from plots import plot_histogram, plot_lineplot, plot_scatter
+from utilits import convert_to_float
+
 
 DATA_PATH: Path = Path("data\\datasample.csv")
-
-
-def convert_to_float(string: str) -> float:
-    """
-    Convert a string to a float.
-    
-    e.x. given the strin `"0,282"`, then `convert_to_float` will return the float `0.282`.
-    
-    Parameters
-    ----------
-    string : str
-        The string which will be converted to a float
-        
-    Returns
-    -------
-    float
-        The converted string
-    
-    Raises
-    ------
-    ValueError
-        If the input string cannot be converted to a float.
-
-    """
-    try:
-        return float(string.replace(",", "."))
-    except ValueError:
-        raise ValueError(f"Could not convert '{string}' to float.")
 
 
 def step_1() -> None:
@@ -83,7 +58,7 @@ def step_3() -> None:
     print(f"Median          : {median_val:.2f}")
 
 
-def step_4():
+def step_4() -> None:
     """
     Plot and view the relationship between `Antal_linjer` and `Teoretisk_bemandning`.
     """
@@ -122,7 +97,7 @@ def step_5(column: str, title: str) -> None:
         plot_histogram(data, f"{title} for {warehouse}", column, "Frekvens")
 
 
-def find_values(df, column) -> tuple[dict[int, list[int]], int, int]:
+def find_values(df: DataFrame, column: str) -> tuple[dict[int, list[int]], int, int]:
     elements = []
     values = df["Week"].unique()
     for week in values:
@@ -131,7 +106,7 @@ def find_values(df, column) -> tuple[dict[int, list[int]], int, int]:
     return elements
 
 
-def func(elements):
+def func(elements: list[dict[int, int]]) -> dict[int, int]:
     keys = [key for element in elements for key in element.keys()]
     min_val = min(keys)
     max_val = max(keys)
@@ -144,7 +119,7 @@ def func(elements):
                 pass
     return a
 
-def create_data_for_mean_min_max(a) -> dict[str, list[int | float]]:
+def create_data_for_mean_min_max(a: dict[int, int]) -> dict[str, list[int | float]]:
     data = {
         "mean": [],
         "max": [],
@@ -179,7 +154,7 @@ def step_7() -> None:
 
 
 
-def find_packages_left_and_wasted_time(mean, schedule):
+def find_packages_left_and_wasted_time(mean: list[int], schedule: list[int]) -> tuple[list[int], list[int]]:
     packages_left = [0]
     wasted_time = []
     for x, y in zip(mean, schedule):
@@ -199,7 +174,8 @@ def create_schedule(work_schedules: list[dict[str, int]]) -> list[int]:
     for i in range(23):
         for work_schedule in work_schedules:
             if work_schedule["start"] <= i <= work_schedule["end"]:
-                schedule[i] += 35 * work_schedule["amount"]                     # 35 is the number of lines each worker can do in a hour
+                # 35 is the number of lines each worker can do in a hour
+                schedule[i] += 35 * work_schedule["amount"]                     
     return schedule
 
 
