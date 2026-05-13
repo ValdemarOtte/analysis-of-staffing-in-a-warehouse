@@ -11,11 +11,19 @@ import matplotlib.pyplot as plt
 plt.style.use("ggplot")
 
 
+COLOR_SCHEME: list[str] = [
+    "#4169E1",
+    "#bb342f",
+    "#218380",
+    "#ead94c",
+]
+
+
 def plot_histogram(
         data: dict[str, list[int | float]],
-        title: str = "Histogram", 
+        title: str = "Histogram",
         xlabel: str = "X label",
-        ylabel: str = "Y label"
+        ylabel: str = "Y label",
     ) -> None:
     """
     Plots a histogram from a dictionary of keys and their corresponding values.
@@ -37,13 +45,13 @@ def plot_histogram(
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
-    
-    
+
+
 def plot_lineplot(
         data: dict[str, list[int | float]],
-        title: str = "Line-plot", 
+        title: str = "Line-plot",
         xlabel: str = "X label",
-        ylabel: str = "Y label"
+        ylabel: str = "Y label",
     ) -> None:
     """
     Plots a line-plot from a dictionary of keys and their corresponding values.
@@ -58,6 +66,35 @@ def plot_lineplot(
     """
     for i, (key, value) in enumerate(data.items()):
         plt.plot(value, label=key, color=COLOR_SCHEME[i])
+    plt.title(title, fontsize=9)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_scatter(
+        data: dict[str, list[int | float]],
+        title: str = "Line-plot",
+        xlabel: str = "X label",
+        ylabel: str = "Y label",
+    ) -> None:
+    """
+    Plots a line-plot from a dictionary of keys and their corresponding values.
+
+    Parameters
+    ----------
+        data: A dictionary object.
+        title: The title of the line-plot. Defaults to `Line-plot`.
+        xlabel: The label for the x-axis. Defaults to `X label`.
+        ylabel: The label for the y-axis. Defaults to `Y label`.
+
+    """
+    keys = list(data.keys())
+    values = list(data.values())
+    plt.scatter(keys, values, color=COLOR_SCHEME[0])
     plt.title(title, fontsize=9)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)

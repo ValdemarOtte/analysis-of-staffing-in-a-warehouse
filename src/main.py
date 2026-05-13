@@ -7,18 +7,11 @@ import numpy as np
 import pandas as pd
 
 # Local files
-from src.plots import plot_histogram, plot_lineplot
-
+from plots import plot_histogram, plot_lineplot, plot_scatter
 
 DATA_PATH: Path = Path("data\\datasample.csv")
-COLOR_SCHEME: list[str] = [
-    "#4169E1",
-    "#bb342f",
-    "#218380",
-    "#ead94c",
-]
 
-  
+
 def convert_to_float(string: str) -> float:
     """
     Convert a string to a float.
@@ -39,6 +32,7 @@ def convert_to_float(string: str) -> float:
     ------
     ValueError
         If the input string cannot be converted to a float.
+
     """
     try:
         return float(string.replace(",", "."))
@@ -51,7 +45,7 @@ def step_1() -> None:
     Load data and plot frequency of `Frigivelsesdato` as a histogram.
     """
     df = pd.read_csv(DATA_PATH, delimiter=";")
-    
+
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
     data = df["Frigivelsesdato"].value_counts().to_dict()
     plot_histogram(data, "Histogram over frigivelser af bestillinger over datoer", "Frigivelsesdatoer", "Frekvens")
@@ -64,10 +58,10 @@ def step_2() -> None:
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
     df["Frigivelsesdato"] =  pd.to_datetime(df["Frigivelsesdato"], format="%d-%m-%Y")
-    
+
     data = df["Frigivelsesdato"].value_counts().to_dict()
     plot_histogram(data, "Histogram over frigivelser af bestillinger over datoer (minus uge 52/53)", "Frigivelsesdatoer", "Frekvens")
-    
+
 
 def step_3() -> None:
     """
@@ -75,7 +69,7 @@ def step_3() -> None:
     """
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
-    
+
     min_val = df["Antal_linjer"].min()
     max_val = df["Antal_linjer"].max()
     mean_val = df["Antal_linjer"].mean()
@@ -98,7 +92,7 @@ def step_4():
 
     for key, value in data.items():
         data[key] = convert_to_float(value)
-    plot_lineplot_(data, "Sammenhæng mellem \"teoretisk bemandning\" og \"Antal linjer\"", "Teoretisk bemandning", "Antal linjer",)
+    plot_scatter(data, "Sammenhæng mellem \"teoretisk bemandning\" og \"Antal linjer\"", "Antal linjer", "Teoretisk bemandning")
 
 
 
@@ -116,6 +110,7 @@ def step_5(column: str, title: str) -> None:
         The column name in the dataset to analyze.
     title : str
         The title for the histogram.
+
     """
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
@@ -163,10 +158,10 @@ def create_data_for_mean_min_max(a) -> dict[str, list[int | float]]:
 
 
 def step_6() -> None:
-    
+
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
-    
+
     elements = find_values(df, "Weekday")
     a = func(elements)
     data = create_data_for_mean_min_max(a)
@@ -176,7 +171,7 @@ def step_6() -> None:
 def step_7() -> None:
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[(df["Week"] <= 51) & (df["Weekday"] <= 5)]
-    
+
     elements = find_values(df, "Hour")
     a = func(elements)
     data = create_data_for_mean_min_max(a)
@@ -200,10 +195,10 @@ def find_packages_left_and_wasted_time(mean, schedule):
 
 
 def create_schedule(work_schedules: list[dict[str, int]]) -> list[int]:
-    schedule = [0 for _ in range(0, 24)]
-    for i in range(0, 23):
+    schedule = [0 for _ in range(24)]
+    for i in range(23):
         for work_schedule in work_schedules:
-            if work_schedule["start"] <= i and i <= work_schedule["end"]:
+            if work_schedule["start"] <= i <= work_schedule["end"]:
                 schedule[i] += 35 * work_schedule["amount"]                     # 35 is the number of lines each worker can do in a hour
     return schedule
 
@@ -211,16 +206,16 @@ def create_schedule(work_schedules: list[dict[str, int]]) -> list[int]:
 def step_8(work_schedules: list[dict[str, int]]) -> None:
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[(df["Week"] <= 51) & (df["Weekday"] <= 5)]
-        
+
     elements = find_values(df, "Hour")
     a = func(elements)
-    # Because the median size of a package 
+    # Because the median size of a package
     scalar = 2
     a = {key: [value * scalar for value in values] for key, values in a.items()}
-    
+
     mean = create_data_for_mean_min_max(a)["mean"]
     # Extent the mean to be 24 hours
-    mean.extend([0 for _ in range(0, 24 - len(mean))])
+    mean.extend([0 for _ in range(24 - len(mean))])
 
     schedule = create_schedule(work_schedules)
     packages_left, wasted_time = find_packages_left_and_wasted_time(mean, schedule)
@@ -229,48 +224,48 @@ def step_8(work_schedules: list[dict[str, int]]) -> None:
         "Mean of confirmed order": np.cumsum(mean).tolist(),
         "Schedule": np.cumsum(schedule).tolist(),
         "Wasted time": np.cumsum(wasted_time).tolist(),
-        "Packages left": packages_left
+        "Packages left": packages_left,
     }
     plot_lineplot(data, "Graf over forventet pakker, pakket pakker af medarbejde, spildtid og pakker tilbage", "Tid", "Antal linjer")
 
 
 def main():
     # Brugt under "2.2) Hvornår bliver en bestilling lavet?"
-    #step_1()
-    #step_2()
-    
+    step_1()
+    step_2()
+
     # Brugt under "2.3) Størrelsen på en bestilling"
-    #step_3()
-    
+    step_3()
+
     # Brugt under "2.4) Hvor hurtigt pakker en medarbejder en bestilling?"
-    #step_4()
-    
+    step_4()
+
     # Brugt under "2.5) I hvilket lager og lageområde findes bestillingen i?"
-    #step_5("Frigivelsesdato", "Histogram over frigivelser af bestillinger over datoer (minus uge 52/53)")
-    #step_5("Lagerområde", "Lagerområder")
+    step_5("Frigivelsesdato", "Histogram over frigivelser af bestillinger over datoer (minus uge 52/53)")
+    step_5("Lagerområde", "Lagerområder")
 
     # Brugt under "2.6) Observeret fordeling på dagsbaseret"
-    #step_6()
-    
+    step_6()
+
     # Brugt under "2.7) Observeret fordeling på timebaseret"
-    #step_7()
-    
+    step_7()
+
     # Brugt under "2.8) Time"
     work_schedules = [
         {
             "start": 6,
             "end": 14,
-            "amount": 12
+            "amount": 12,
         },
         {
             "start": 8,
             "end": 16,
-            "amount": 20
+            "amount": 20,
         },
         {
             "start": 15,
             "end": 23,
-            "amount": 8
+            "amount": 8,
         },
     ]
     step_8(work_schedules)

@@ -1,4 +1,6 @@
-# 
+# Analysis of staffing in a warehouse
+Given only a `.csv`-file, how would I handle the analysis about when and where to staff people in a given warehouse. 
+
 
 ## Problemstilling
 
@@ -126,18 +128,6 @@ Hertil vil en af løsningerne være følgende vagtplan:
 Figuren viser, at alle bestillinger for den pågældende dag bliver pakket, men at der opstår spildtid for medarbejderne til sidst af dagen.
 
 ![fig_10](./figures/fig_10.png)
-
-
-
-
-Vi forudsætter, at medarbejderne kan organiseres i følgende vagthold:
-
-
-
-###
-
-
-
 
 
 ## Andre vinkler
