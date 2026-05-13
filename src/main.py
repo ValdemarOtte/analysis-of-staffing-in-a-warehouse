@@ -106,50 +106,59 @@ def find_values(df: DataFrame, column: str) -> tuple[dict[int, list[int]], int, 
     return elements
 
 
-def func(elements: list[dict[int, int]]) -> dict[int, int]:
+def transform_elements(elements: list[dict[int, int]]) -> dict[int, int]:
     keys = [key for element in elements for key in element.keys()]
     min_val = min(keys)
     max_val = max(keys)
-    a = {key: [] for key in range(min_val, max_val+1)}
+    elements_ = {key: [] for key in range(min_val, max_val+1)}
     for element in elements:
         for key, value in element.items():
             try:
-                a[key].append(value)
+                elements_[key].append(value)
             except KeyError:
                 pass
-    return a
+    return elements_
 
-def create_data_for_mean_min_max(a: dict[int, int]) -> dict[str, list[int | float]]:
+def create_data_for_mean_min_max(elements: dict[int, int]) -> dict[str, list[int | float]]:
     data = {
         "mean": [],
         "max": [],
         "min": [],
     }
-    for value in a.values():
-        data["mean"].append(np.mean(value))
-        data["max"].append(max(value))
-        data["min"].append(min(value))
+    for element in elements.values():
+        data["mean"].append(np.mean(element))
+        data["max"].append(max(element))
+        data["min"].append(min(element))
     return data
 
 
 def step_6() -> None:
-
+    """
+    Plot and view the frequency of `Frigivelsesdato` for `Weekdays` as a histogram.
+    
+    Plot the mean, min and max value each day.
+    """
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[df["Week"] <= 51]
 
     elements = find_values(df, "Weekday")
-    a = func(elements)
-    data = create_data_for_mean_min_max(a)
+    elements_ = transform_elements(elements)
+    data = create_data_for_mean_min_max(elements_)
     plot_lineplot(data, "Graf over frekvens af bestillinger over ugedage", "Ugedage", "Frekvens")
 
 
 def step_7() -> None:
+    """
+    Plot and view the frequency of `Frigivelsesdato` for `Hour` as a histogram.
+    
+    Plot the mean, min and max value each hour.
+    """
     df = pd.read_csv(DATA_PATH, delimiter=";")
     df = df[(df["Week"] <= 51) & (df["Weekday"] <= 5)]
 
     elements = find_values(df, "Hour")
-    a = func(elements)
-    data = create_data_for_mean_min_max(a)
+    elements_ = transform_elements(elements)
+    data = create_data_for_mean_min_max(elements_)
     plot_lineplot(data, "Graf over frekvens af bestillinger over timer", "Tid", "Frekvens")
 
 
@@ -184,13 +193,13 @@ def step_8(work_schedules: list[dict[str, int]]) -> None:
     df = df[(df["Week"] <= 51) & (df["Weekday"] <= 5)]
 
     elements = find_values(df, "Hour")
-    a = func(elements)
-    # Because the median size of a package
+    elements_ = transform_elements(elements)
+    # Because the median size of a package is 2
     scalar = 2
-    a = {key: [value * scalar for value in values] for key, values in a.items()}
+    a = {key: [value * scalar for value in values] for key, values in elements_.items()}
 
     mean = create_data_for_mean_min_max(a)["mean"]
-    # Extent the mean to be 24 hours
+    # Extent the mean to be 24 hours long
     mean.extend([0 for _ in range(24 - len(mean))])
 
     schedule = create_schedule(work_schedules)
